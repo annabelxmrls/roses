@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Civics Practice</title>
+<style>
+:root{--bg:#F3F5F9;--card:#fff;--ink:#14213D;--mut:#5B6577;--line:#CDD4E1;--btn:#14213D;--btnt:#fff;--ok:#1E7B4F;--okbg:#E3F3EA;--bad:#B4232E;--badbg:#FBE7E9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1424;--card:#17203A;--ink:#EAEEF7;--mut:#9AA5BC;--line:#2A3556;--btn:#EAEEF7;--btnt:#0E1424;--ok:#5CCB93;--okbg:#14301F;--bad:#FF8A93;--badbg:#3A1A20;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1424;--card:#17203A;--ink:#EAEEF7;--mut:#9AA5BC;--line:#2A3556;--btn:#EAEEF7;--btnt:#0E1424;--ok:#5CCB93;--okbg:#14301F;--bad:#FF8A93;--badbg:#3A1A20;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:28px 18px 48px}
+h1,h2{font-family:Georgia,"Iowan Old Style",serif;line-height:1.25;margin:0 0 12px}
+h1{font-size:2rem}h2{font-size:1.5rem}
+.mut{color:var(--mut)}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+#prog{display:flex;gap:5px;margin-bottom:10px}
+#prog span{flex:1;height:8px;border-radius:4px;background:var(--line)}
+#prog .cur{background:var(--mut)}#prog .ok{background:var(--ok)}#prog .bad{background:var(--bad)}
+#count{margin:0 0 18px;font-size:.9rem}
+#q{font-size:1.45rem}
+#hint{margin:0 0 14px;font-size:.95rem;min-height:0}
+input{width:100%;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+input:focus{outline:3px solid var(--mut);outline-offset:1px;border-color:var(--mut)}
+input:disabled{opacity:.75}
+.btn{font:inherit;font-weight:600;margin-top:16px;padding:12px 22px;border:0;border-radius:10px;background:var(--btn);color:var(--btnt);cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--mut);outline-offset:2px}
+.fb{margin-top:14px;padding:12px 14px;border-radius:10px;border-left:5px solid}
+.fb p{margin:4px 0 0}
+.fb.ok{background:var(--okbg);border-color:var(--ok)}.fb.ok strong{color:var(--ok)}
+.fb.bad{background:var(--badbg);border-color:var(--bad)}.fb.bad strong{color:var(--bad)}
+.miss{border-top:1px solid var(--line);padding:14px 0}
+.miss p{margin:4px 0}.miss .q{font-weight:600}
+[hidden]{display:none!important}
+.item{padding:16px 0;border-top:1px solid var(--line)}.item:first-child{border-top:0;padding-top:0}
+.ql{display:block;font-family:Georgia,"Iowan Old Style",serif;font-size:1.2rem;line-height:1.35;margin-bottom:8px}
+ol{list-style:none;padding:0;margin:0}.hint{margin:0 0 8px;font-size:.95rem}
+#result{padding-bottom:12px;margin-bottom:8px;border-bottom:2px solid var(--line)}
+</style>
+</head>
+<body>
+<main>
+<section id="start">
+<h1>Citizenship test practice</h1>
+<p>You get 10 random questions from the 100 civics questions, all on one page. Type your answers, then submit them all at once to see what you got right and the correct answer for anything you missed.</p>
+<p class="mut">On “name two” or “name three” questions, any correct combination counts, in any order.</p>
+<button id="go" class="btn">Start quiz</button>
+</section>
+<section id="quiz" hidden>
+<div id="result" hidden>
+<h2 id="score"></h2>
+<p id="msg" class="mut"></p>
+</div>
+<ol id="list"></ol>
+<button id="submit" class="btn">Submit all answers</button>
+<button id="again" class="btn" hidden>New quiz</button>
+</section>
+</main>
+<script>
+const D=[{"q":"What is the supreme law of the land?","a":["the Constitution","the constitution"],"k":1},{"q":"What does the Constitution do?","a":["sets up the government","defines the government","protects basic rights of Americans"],"k":1},{"q":"The idea of self-government is in the first three words of the Constitution. What are these words?","a":["We the People"],"k":1},{"q":"What is an amendment?","a":["a change (to the Constitution)","an addition (to the Constitution)"],"k":1},{"q":"What do we call the first ten amendments to the Constitution?","a":["the Bill of Rights"],"k":1},{"q":"What is one right or freedom from the First Amendment?","a":["speech","religion","assembly"],"k":1},{"q":"How many amendments does the Constitution have?","a":["27","twenty-seven"],"k":1},{"q":"What did the Declaration of Independence do?","a":["announced our independence (from Great Britain)","declared our independence (from Great Britain)","said that the United States is free (from Great Britain)"],"k":1},{"q":"What are two rights in the Declaration of Independence?","k":2,"p":[["life"],["liberty"],["pursuit of happiness","happiness"]]},{"q":"What is freedom of religion?","a":["You can practice any religion, or not practice a religion."],"k":1},{"q":"What is the economic system in the United States?","a":["capitalist economy","market economy"],"k":1},{"q":"What is the “rule of law”?","a":["Everyone must follow the law.","Leaders must obey the law.","Government must obey the law.","No one is above the law."],"k":1},{"q":"Name one branch or part of the government.","a":["Congress","legislative","President"],"k":1},{"q":"What stops one branch of government from becoming too powerful?","a":["checks and balances","separation of powers"],"k":1},{"q":"Who is in charge of the executive branch?","a":["the President"],"k":1},{"q":"Who makes federal laws?","a":["Congress","Senate and House (of Representatives)","(U.S. or national) legislature"],"k":1},{"q":"What are the two parts of the U.S. Congress?","k":2,"p":[["the Senate","Senate"],["House (of Representatives)","House","House of Representatives"]]},{"q":"How many U.S. Senators are there?","a":["one hundred","100"],"k":1},{"q":"We elect a U.S. Senator for how many years?","a":["six","6"],"k":1},{"q":"Who is one of your state’s U.S. Senators now?","a":["Alex Padilla","Adam Schiff","Padilla","Schiff"],"k":1},{"q":"The House of Representatives has how many voting members?","a":["four hundred thirty-five","435"],"k":1},{"q":"We elect a U.S. Representative for how many years?","a":["two","2"],"k":1},{"q":"Name your U.S. Representative.","a":["Mark DeSaulnier","DeSaulnier"],"k":1},{"q":"Who does a U.S. Senator represent?","a":["all people of the state"],"k":1},{"q":"Why do some states have more Representatives than other states?","a":["(because of) the state's population","(because) they have more people","(because) some states have more people"],"k":1},{"q":"We elect a President for how many years?","a":["four","4"],"k":1},{"q":"In what month do we vote for President?","a":["November"],"k":1},{"q":"What is the name of the President of the United States now?","a":["Donald Trump","Trump"],"k":1},{"q":"What is the name of the Vice President of the United States now?","a":["JD Vance","Vance"],"k":1},{"q":"If the President can no longer serve, who becomes President?","a":["the Vice President"],"k":1},{"q":"If both the President and the Vice President can no longer serve, who becomes President?","a":["the Speaker of the House"],"k":1},{"q":"Who is the Commander in Chief of the military?","a":["the President"],"k":1},{"q":"Who signs bills to become laws?","a":["the President"],"k":1},{"q":"Who vetoes bills?","a":["the President"],"k":1},{"q":"What does the President’s Cabinet do?","a":["advises the President"],"k":1},{"q":"What are two Cabinet-level positions?","k":2,"p":[["Secretary of Agriculture","Agriculture"],["Secretary of Commerce","Commerce"],["Secretary of Defense","Defense"],["Secretary of Education","Education"],["Secretary of Energy","Energy"],["Secretary of Health and Human Services","Health and Human Services"],["Secretary of Homeland Security","Homeland Security"],["Secretary of Housing and Urban Development","Housing and Urban Development","HUD"],["Secretary of Interior","Interior"],["Secretary of Labor","Labor"],["Secretary of State","State"],["Secretary of Transportation","Transportation"],["Secretary of Treasury","Treasury"],["Secretary of Veterans Affairs","Veterans Affairs"],["Attorney General"],["Vice President"]]},{"q":"What does the judicial branch do?","a":["reviews laws","explains laws","resolves disputes (disagreements)","decides if a law goes against the Constitution"],"k":1},{"q":"What is the highest court in the United States?","a":["the Supreme Court"],"k":1},{"q":"How many justices are on the Supreme Court?","a":["nine","9"],"k":1},{"q":"Who is the Chief Justice of the United States now?","a":["John Roberts","John G. Roberts, Jr.","Roberts"],"k":1},{"q":"Under our Constitution, some powers belong to the federal government. What is one power of the federal government?","a":["to print money","to declare war","to create an army","to make treaties"],"k":1},{"q":"Under our Constitution, some powers belong to the states. What is one power of the states?","a":["provide schooling and education","provide protection","provide safety","give a driver's license","approve zoning and land use"],"k":1},{"q":"Who is the Governor of your state now?","a":["Gavin Newsom","Newsom"],"k":1},{"q":"What is the capital of your state?","a":["Sacramento"],"k":1},{"q":"What are the two major political parties in the United States?","k":2,"p":[["Democratic","Democrat","Democratic Party"],["Republican","Republican Party"]]},{"q":"What is the political party of the President now?","a":["Republican","Republican Party"],"k":1},{"q":"What is the name of the Speaker of the House of Representatives now?","a":["Mike Johnson","Johnson","James Michael Johnson"],"k":1},{"q":"There are four amendments to the Constitution about who can vote. Describe one of them.","a":["Citizens eighteen (18) and older (can vote).","You don't have to pay (a poll tax) to vote.","Any citizen can vote. (Women and men can vote.)","A male citizen of any race (can vote).","18 and older","eighteen and older","no poll tax","poll tax","women can vote","men and women can vote","any citizen can vote","any race can vote"],"k":1},{"q":"What is one responsibility that is only for United States citizens?","a":["serve on a jury","vote in a federal election"],"k":1},{"q":"Name one right only for United States citizens.","a":["vote in a federal election","run for federal office"],"k":1},{"q":"What are two rights of everyone living in the United States?","k":2,"p":[["freedom of expression","expression"],["freedom of speech","speech"],["freedom of religion","religion"],["freedom of assembly","assembly"],["right to petition the government","petition"],["right to bear arms","bear arms"]]},{"q":"What do we show loyalty to when we say the Pledge of Allegiance?","a":["the United States","the flag"],"k":1},{"q":"What is one promise you make when you become a United States citizen?","a":["give up loyalty to other countries","be loyal to the United States"],"k":1},{"q":"How old do citizens have to be to vote for President?","a":["18 and older"],"k":1},{"q":"What are two ways that Americans can participate in their democracy?","k":2,"p":[["vote"],["join a political party","political party"],["help with a campaign","campaign"],["join a civic group","civic group"],["join a community group","community group"],["give an elected official your opinion","opinion"],["call Senators and Representatives","call senators"],["publicly support or oppose an issue or policy","support or oppose"],["run for office"],["write to a newspaper","newspaper"]]},{"q":"When is the last day you can send in federal income tax forms?","a":["April 15","April 15th","4/15"],"k":1},{"q":"When must all men register for the Selective Service?","a":["at age 18","18","between 18 and 26"],"k":1},{"q":"What is one reason colonists came to America?","a":["freedom","political liberty","religious freedom","economic opportunity","escape persecution"],"k":1},{"q":"Who lived in America before the Europeans arrived?","a":["American Indians","Native Americans"],"k":1},{"q":"What group of people was taken to America and sold as slaves?","a":["Africans","people from Africa"],"k":1},{"q":"Why did the colonists fight the British?","a":["because of high taxes","because the British army stayed in their houses","because they didn't have self-government"],"k":1},{"q":"Who wrote the Declaration of Independence?","a":["Thomas Jefferson","Jefferson"],"k":1},{"q":"When was the Declaration of Independence adopted?","a":["July 4, 1776"],"k":1},{"q":"There were 13 original states. Name three.","k":3,"p":[["Delaware"],["Pennsylvania"],["New Jersey"],["Georgia"],["Connecticut"],["Massachusetts"],["Maryland"],["South Carolina"],["New Hampshire"],["Virginia"],["New York"],["North Carolina"],["Rhode Island"]]},{"q":"What happened at the Constitutional Convention?","a":["The Constitution was written","The Founding Fathers wrote the Constitution"],"k":1},{"q":"When was the Constitution written?","a":["1787"],"k":1},{"q":"The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.","a":["James Madison","Alexander Hamilton","John Jay","Publius"],"k":1},{"q":"What is one thing Benjamin Franklin is famous for?","a":["U.S. diplomat","oldest member of Constitutional Convention","started first free libraries"],"k":1},{"q":"Who is the “Father of Our Country”?","a":["George Washington","Washington"],"k":1},{"q":"Who was the first President?","a":["George Washington","Washington"],"k":1},{"q":"What territory did the United States buy from France in 1803?","a":["the Louisiana Territory","Louisiana"],"k":1},{"q":"Name one war fought by the United States in the 1800s.","a":["War of 1812","Mexican-American War","Civil War","Spanish-American War"],"k":1},{"q":"Name the U.S. war between the North and the South.","a":["the Civil War","the War between the States"],"k":1},{"q":"Name one problem that led to the Civil War.","a":["slavery","economic reasons","states' rights"],"k":1},{"q":"What was one important thing that Abraham Lincoln did?","a":["freed the slaves (Emancipation Proclamation)","saved (or preserved) the Union","led the United States during the Civil War"],"k":1},{"q":"What did the Emancipation Proclamation do?","a":["freed the slaves","freed slaves in the Confederacy","freed slaves in the Confederate states","freed slaves in most Southern states"],"k":1},{"q":"What did Susan B. Anthony do?","a":["fought for women's rights","fought for civil rights"],"k":1},{"q":"Name one war fought by the United States in the 1900s.","a":["World War I","World War II","Korean War","Vietnam War","(Persian) Gulf War"],"k":1},{"q":"Who was President during World War I?","a":["Woodrow Wilson","Wilson"],"k":1},{"q":"Who was President during the Great Depression and World War II?","a":["Franklin Roosevelt","Roosevelt"],"k":1},{"q":"Who did the United States fight in World War II?","k":3,"p":[["Japan"],["Germany"],["Italy"]]},{"q":"Before he was President, Eisenhower was a general. What war was he in?","a":["World War II"],"k":1},{"q":"During the Cold War, what was the main concern of the United States?","a":["Communism"],"k":1},{"q":"What movement tried to end racial discrimination?","a":["Civil Rights movement"],"k":1},{"q":"What did Martin Luther King, Jr. do?","a":["fought for civil rights","worked for equality for all Americans"],"k":1},{"q":"What major event happened on September 11, 2001, in the United States?","a":["Terrorists attacked the United States"],"k":1},{"q":"Name one American Indian tribe in the United States.","a":["Cherokee","Navajo","Pueblo","Apache"],"k":1},{"q":"Name one of the two longest rivers in the United States.","a":["Missouri River","Mississippi River"],"k":1},{"q":"What ocean is on the West Coast of the United States?","a":["Pacific Ocean"],"k":1},{"q":"What ocean is on the East Coast of the United States?","a":["Atlantic Ocean"],"k":1},{"q":"Name one U.S. territory.","a":["Puerto Rico","U.S. Virgin Islands","American Samoa","Guam","Northern Mariana Islands"],"k":1},{"q":"Name one state that borders Canada.","a":["Montana","Idaho"],"k":1},{"q":"Name one state that borders Mexico.","a":["California","Arizona","New Mexico","Texas"],"k":1},{"q":"What is the capital of the United States?","a":["Washington, D.C.","DC"],"k":1},{"q":"Where is the Statue of Liberty?","a":["New York","New York Harbor","Liberty Island"],"k":1},{"q":"Why does the flag have 13 stripes?","a":["because there were 13 original colonies","because the stripes represent the original colonies"],"k":1},{"q":"Why does the flag have 50 stars?","a":["because there is one star for each state","because each star represents a state","because there are 50 states"],"k":1},{"q":"What is the name of the national anthem?","a":["The Star-Spangled Banner"],"k":1},{"q":"When do we celebrate Independence Day?","a":["July 4","July 4th","Fourth of July","4th of July","July fourth","7/4"],"k":1},{"q":"Name two national U.S. holidays.","k":2,"p":[["New Year’s Day"],["Martin Luther King Jr. Day","MLK Day","Martin Luther King Day"],["Presidents’ Day","Washington’s Birthday"],["Memorial Day"],["Juneteenth"],["Independence Day","Fourth of July","July 4th"],["Labor Day"],["Columbus Day"],["Veterans Day"],["Thanksgiving"],["Christmas"]]}];
+/*M*/
+const STOP=new Set("of to and or is are in on our we you can because they their it for that by from with be as at".split(" "));
+const ART=new Set(["the","a","an"]);
+const toks=s=>s.toLowerCase().replace(/[’']/g,"").replace(/\./g,"").replace(/[^a-z0-9]+/g," ").trim().split(" ").filter(w=>w&&!ART.has(w));
+function lev(a,b){const m=a.length,n=b.length;let p=[...Array(n+1).keys()];for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+const feq=(a,b)=>{if(a===b)return true;const L=Math.max(a.length,b.length),d=L<=4?0:L<=9?1:2;return Math.abs(a.length-b.length)<=d&&lev(a,b)<=d};
+const seq=(x,y)=>x.length===y.length&&x.every((t,i)=>feq(t,y[i]));
+const has=(t,v)=>{for(let i=0;i+v.length<=t.length;i++)if(seq(t.slice(i,i+v.length),v))return true;return false};
+const variants=a=>[a.replace(/\([^)]*\)/g," "),a.replace(/[()]/g," ")].map(toks).filter(v=>v.length);
+function matchOne(tt,a){
+for(const v of variants(a)){
+if(seq(tt,v))return true;
+if(tt.length<=v.length+3&&has(tt,v))return true;
+const c=v.filter(w=>!STOP.has(w));
+if(c.length>=3&&c.filter(w=>tt.some(x=>feq(x,w))).length>=Math.ceil(c.length*.75))return true}
+return false}
+function grade(q,typed){
+const tt=toks(typed);if(!tt.length)return{ok:false,n:0};
+if(q.k>1){const n=q.p.filter(it=>it.some(a=>{const v=toks(a);return v.length&&has(tt,v)})).length;return{ok:n>=q.k,n}}
+const ok=q.a.some(a=>matchOne(tt,a));return{ok,n:ok?1:0}}
+/*E*/
+const $=s=>document.querySelector(s);
+const view=n=>["start","quiz"].forEach(v=>$("#"+v).hidden=v!==n);
+const ansText=q=>q.k>1?"Any "+q.k+" of: "+q.p.map(x=>x[0]).join("; "):q.a.join(" / ");
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;e.textContent=x;return e};
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+let Q;
+function start(){Q=shuffle(D.slice()).slice(0,10);const L=$("#list");L.textContent="";
+Q.forEach((q,n)=>{const li=el("li","item","");const lab=el("label","ql",(n+1)+". "+q.q);lab.htmlFor="a"+n;li.append(lab);
+if(q.k>1)li.append(el("p","mut hint","Give "+q.k+" answers. Separate them with “and” or a comma."));
+const inp=document.createElement("input");inp.id="a"+n;inp.type="text";inp.autocomplete="off";inp.autocapitalize="off";inp.spellcheck=false;inp.placeholder="Type your answer";
+inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();(n<9?$("#a"+(n+1)):$("#submit")).focus()}});
+li.append(inp);const fb=el("div","fb","");fb.id="f"+n;fb.hidden=true;li.append(fb);L.append(li)});
+$("#result").hidden=true;$("#submit").hidden=false;$("#again").hidden=true;view("quiz");window.scrollTo(0,0);$("#a0").focus()}
+function submit(){let s=0;
+Q.forEach((q,n)=>{const inp=$("#a"+n),g=grade(q,inp.value);inp.disabled=true;if(g.ok)s++;
+const f=$("#f"+n);f.hidden=false;f.className="fb "+(g.ok?"ok":"bad");f.textContent="";
+f.append(el("strong","",g.ok?"Correct":"Not quite"));
+if(!g.ok){if(q.k>1)f.append(el("p","","You gave "+g.n+" of "+q.k+" correct answers."));f.append(el("p","","Correct answer: "+ansText(q)))}});
+$("#score").textContent="You got "+s+" out of 10";
+$("#msg").textContent=s===10?"Perfect score.":"Review the answers below, then start a new quiz.";
+$("#result").hidden=false;$("#submit").hidden=true;$("#again").hidden=false;window.scrollTo({top:0,behavior:"smooth"})}
+$("#go").onclick=$("#again").onclick=start;
+$("#submit").onclick=submit;
+</script>
+</body>
+</html>
