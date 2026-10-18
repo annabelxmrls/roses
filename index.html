@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Civics Practice</title>
+<title>Civics Practice Test</title>
 <style>
 :root{--bg:#F3F5F9;--card:#fff;--ink:#14213D;--mut:#5B6577;--line:#CDD4E1;--btn:#14213D;--btnt:#fff;--ok:#1E7B4F;--okbg:#E3F3EA;--bad:#B4232E;--badbg:#FBE7E9;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -39,12 +39,17 @@ input:disabled{opacity:.75}
 .ql{display:block;font-family:Georgia,"Iowan Old Style",serif;font-size:1.2rem;line-height:1.35;margin-bottom:8px}
 ol{list-style:none;padding:0;margin:0}.hint{margin:0 0 8px;font-size:.95rem}
 #result{padding-bottom:12px;margin-bottom:8px;border-bottom:2px solid var(--line)}
+.sp{margin-top:10px;padding:10px 14px;border-radius:10px;border-left:5px solid #E07B00;background:#FFF1DB;color:#5A3300;font-size:1.05rem}
+.sp p{margin:4px 0 0}.sp p.n{font-size:.9rem}
+.dif{background:#FFC857;color:#3D2400;border-radius:3px;padding:0 2px;font-weight:700;text-decoration:underline;text-decoration-color:#B35A00;text-decoration-thickness:2px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .sp{background:#3A2A0E;color:#FFD9A0;border-color:#FF9F1C}:root:not([data-theme="light"]) .dif{background:#FF9F1C;color:#2A1800}}
+:root[data-theme="dark"] .sp{background:#3A2A0E;color:#FFD9A0;border-color:#FF9F1C}:root[data-theme="dark"] .dif{background:#FF9F1C;color:#2A1800}
 </style>
 </head>
 <body>
 <main>
 <section id="start">
-<h1>Civics Practice</h1>
+<h1>Civics Practice Test</h1>
 <p>You get 10 random questions from the 100 civics questions, all on one page. Type your answers, then submit them all at once to see what you got right and the correct answer for anything you missed.</p>
 <p class="mut">On “name two” or “name three” questions, any correct combination counts, in any order.</p>
 <button id="go" class="btn">Start quiz</button>
@@ -81,11 +86,21 @@ function grade(q,typed){
 const tt=toks(typed);if(!tt.length)return{ok:false,n:0};
 if(q.k>1){const n=q.p.filter(it=>it.some(a=>{const v=toks(a);return v.length&&has(tt,v)})).length;return{ok:n>=q.k,n}}
 const ok=q.a.some(a=>matchOne(tt,a));return{ok,n:ok?1:0}}
+function align(a,b){const m=a.length,n=b.length,d=[];for(let i=0;i<=m;i++){d[i]=[i];for(let j=1;j<=n;j++)d[i][j]=i?Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)):j}
+const ma=Array(m).fill(0),mb=Array(n).fill(0);let i=m,j=n;
+while(i||j){if(i&&j&&d[i][j]===d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)){if(a[i-1]!==b[j-1]){ma[i-1]=1;mb[j-1]=1}i--;j--}else if(i&&d[i][j]===d[i-1][j]+1){ma[i-1]=1;i--}else{mb[j-1]=1;j--}}
+return[ma,mb,d[m][n]]}
+function spell(q,typed){const C=new Set(q.k>1?q.p.flat().flatMap(toks):q.a.flatMap(a=>variants(a).flat()));const out=[],seen=new Set();
+for(const w of toks(typed)){if(w.length<3||/\d/.test(w)||STOP.has(w)||C.has(w)||seen.has(w))continue;seen.add(w);
+let best=null,bd=99;for(const c of C){if(c.length<3||/\d/.test(c))continue;const d=align(w,c)[2];if(d<bd){bd=d;best=c}}
+if(best&&bd<=Math.max(1,Math.floor(Math.max(w.length,best.length)*.4))){const r=align(w,best);out.push([w,r[0],best,r[1]])}}
+return out.slice(0,4)}
 /*E*/
 const $=s=>document.querySelector(s);
 const view=n=>["start","quiz"].forEach(v=>$("#"+v).hidden=v!==n);
 const ansText=q=>q.k>1?"Any "+q.k+" of: "+q.p.map(x=>x[0]).join("; "):q.a.join(" / ");
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;e.textContent=x;return e};
+const hl=(w,m)=>{const s=document.createElement("span");[...w].forEach((ch,k)=>s.append(m[k]?el("span","dif",ch):document.createTextNode(ch)));return s};
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 let Q;
 function start(){Q=shuffle(D.slice()).slice(0,10);const L=$("#list");L.textContent="";
@@ -97,9 +112,13 @@ li.append(inp);const fb=el("div","fb","");fb.id="f"+n;fb.hidden=true;li.append(f
 $("#result").hidden=true;$("#submit").hidden=false;$("#again").hidden=true;view("quiz");window.scrollTo(0,0);$("#a0").focus()}
 function submit(){let s=0;
 Q.forEach((q,n)=>{const inp=$("#a"+n),g=grade(q,inp.value);inp.disabled=true;if(g.ok)s++;
-const f=$("#f"+n);f.hidden=false;f.className="fb "+(g.ok?"ok":"bad");f.textContent="";
-f.append(el("strong","",g.ok?"Correct":"Not quite"));
-if(!g.ok){if(q.k>1)f.append(el("p","","You gave "+g.n+" of "+q.k+" correct answers."));f.append(el("p","","Correct answer: "+ansText(q)))}});
+const f=$("#f"+n);f.hidden=false;const sp=spell(q,inp.value),sw=sp.length>0;f.className=sw?"sp":"fb "+(g.ok?"ok":"bad");f.textContent="";
+f.append(el("strong","",sw?(g.ok?"Correct, but check the spelling":"Not quite. Check the spelling"):(g.ok?"Correct":"Not quite")));
+if(!g.ok&&q.k>1)f.append(el("p","","You gave "+g.n+" of "+q.k+" correct answers."));
+if(sw){const p=el("p","","");
+sp.forEach((x,k)=>{if(k)p.append("; ");p.append(hl(x[0],x[1])," → ",hl(x[2],x[3]))});
+f.append(p,el("p","n","Highlighted letters are the ones that are different."))}
+if(!g.ok)f.append(el("p","","Correct answer: "+ansText(q)))});
 $("#score").textContent="You got "+s+" out of 10";
 $("#msg").textContent=s===10?"Perfect score.":"Review the answers below, then start a new quiz.";
 $("#result").hidden=false;$("#submit").hidden=true;$("#again").hidden=false;window.scrollTo({top:0,behavior:"smooth"})}
